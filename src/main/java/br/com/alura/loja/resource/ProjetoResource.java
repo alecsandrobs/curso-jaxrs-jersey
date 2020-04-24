@@ -9,6 +9,7 @@ import com.thoughtworks.xstream.XStream;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
@@ -26,9 +27,16 @@ public class ProjetoResource {
     }
 
     @GET
+    @Produces(APPLICATION_XML)
+    public List<Projeto> get() {
+        return new ProjetoDAO().busca();
+
+    }
+
+    @GET
     @Path("{id}")
     @Produces(APPLICATION_XML)
-    public Projeto busca(@PathParam("id") Long id) {
+    public Projeto getById(@PathParam("id") Long id) {
         Projeto projeto = new ProjetoDAO().busca(id);
         return projeto;
     }
