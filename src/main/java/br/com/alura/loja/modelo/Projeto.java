@@ -39,8 +39,7 @@ public class Projeto {
         return new XStream().toXML(this);
     }
 
-    public String toJSON() {
-        Gson gson = new Gson();
-        return gson.toJson(this);
+    public String toJson() {
+        return new Gson().toJson(this);
     }
 }

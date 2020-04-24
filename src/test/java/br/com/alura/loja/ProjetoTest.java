@@ -19,8 +19,8 @@ public class ProjetoTest {
     private static final String XML = "xml";
     private static final String JSON = "json";
 
-    public String getProjetos(String type) {
-        return String.format("/projetos/%s", type);
+    public String getProjeto1(String type) {
+        return String.format("/projetos/%s/1", type);
     }
 
     @Before
@@ -37,7 +37,7 @@ public class ProjetoTest {
     public void testaQueBuscarUmCarrinhoTrazOCarrinhoEsperadoXml() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(URI);
-        String conteudo = target.path(getProjetos(XML)).request().get(String.class);
+        String conteudo = target.path(getProjeto1(XML)).request().get(String.class);
         Projeto projeto = (Projeto) new XStream().fromXML(conteudo);
         assertEquals("Minha loja", projeto.getNome());
         assertEquals(2014, projeto.getAnoDeInicio());
@@ -47,7 +47,7 @@ public class ProjetoTest {
     public void testaQueBuscarUmCarrinhoTrazOCarrinhoEsperadoJson() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(URI);
-        String conteudo = target.path(getProjetos(JSON)).request().get(String.class);
+        String conteudo = target.path(getProjeto1(JSON)).request().get(String.class);
         Projeto projeto = new Gson().fromJson(conteudo, Projeto.class);
         assertEquals("Minha loja", projeto.getNome());
         assertEquals(2014, projeto.getAnoDeInicio());
