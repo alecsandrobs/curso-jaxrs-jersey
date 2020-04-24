@@ -1,6 +1,7 @@
 package br.com.alura.loja.resource;
 
 import br.com.alura.loja.dao.ProjetoDAO;
+import br.com.alura.loja.modelo.Produto;
 import br.com.alura.loja.modelo.Projeto;
 import com.google.gson.Gson;
 import com.thoughtworks.xstream.XStream;
@@ -15,19 +16,21 @@ import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 @Path("projetos")
 public class ProjetoResource {
 
-    private final String XML = "xml";
-    private final String JSON = "json";
-
-    private URI getUri(String type, Long id) {
-        return URI.create(String.format("/carrinhos/%s/%d", type, id));
+    private URI getUri(Long... id) {
+        final String RESOURCE = "projetos";
+        if (id.length > 0) {
+            return URI.create(String.format("/%s/%s", RESOURCE, id[0]));
+        } else {
+            return URI.create(String.format("/%s", RESOURCE));
+        }
     }
 
     @GET
-    @Path("xml/{id}")
+    @Path("{id}")
     @Produces(APPLICATION_XML)
-    public String buscaXml(@PathParam("id") Long id) {
+    public Projeto busca(@PathParam("id") Long id) {
         Projeto projeto = new ProjetoDAO().busca(id);
-        return projeto.toXML();
+        return projeto;
     }
 
     @GET
@@ -40,30 +43,14 @@ public class ProjetoResource {
 
     @POST
     @Consumes(APPLICATION_XML)
-    public Response postXml(String conteudo) {
-        Projeto projeto = (Projeto) new XStream().fromXML(conteudo);
+    public Response post(Projeto projeto) {
         new ProjetoDAO().adiciona(projeto);
-        return Response.created(getUri(XML, projeto.getId())).build();
-    }
-
-    @POST
-    @Consumes(APPLICATION_JSON)
-    public Response postJson(String conteudo) {
-        Projeto projeto = new Gson().fromJson(conteudo, Projeto.class);
-        new ProjetoDAO().adiciona(projeto);
-        return Response.created(getUri(JSON, projeto.getId())).build();
+        return Response.created(getUri(projeto.getId())).build();
     }
 
     @DELETE
-    @Path("xml/{id}")
-    public Response deleteXml(@PathParam("id") Long id) {
-        new ProjetoDAO().remove(id);
-        return Response.ok().build();
-    }
-
-    @DELETE
-    @Path("json/{id}")
-    public Response deleteJson(@PathParam("id") Long id) {
+    @Path("{id}")
+    public Response delete(@PathParam("id") Long id) {
         new ProjetoDAO().remove(id);
         return Response.ok().build();
     }

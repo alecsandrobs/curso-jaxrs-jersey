@@ -3,6 +3,13 @@ package br.com.alura.loja.modelo;
 import com.google.gson.Gson;
 import com.thoughtworks.xstream.XStream;
 
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import static javax.xml.bind.annotation.XmlAccessType.FIELD;
+
+@XmlRootElement
+@XmlAccessorType(FIELD)
 public class Projeto {
     private long id;
     private String nome;
@@ -16,7 +23,6 @@ public class Projeto {
     }
 
     public Projeto() {
-        super();
     }
 
     public void setId(long id) {

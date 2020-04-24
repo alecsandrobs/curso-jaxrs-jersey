@@ -16,19 +16,21 @@ import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 @Path("carrinhos")
 public class CarrinhoResource {
 
-    private final String XML = "xml";
-    private final String JSON = "json";
-
-    private URI getUri(String type, Long id) {
-        return URI.create(String.format("/carrinhos/%s/%d", type, id));
+    private URI getUri(Long... id) {
+        final String RESOURCE = "carrinhos";
+        if (id.length > 0) {
+            return URI.create(String.format("/%s/%s", RESOURCE, id[0]));
+        } else {
+            return URI.create(String.format("/%s", RESOURCE));
+        }
     }
 
     @GET()
-    @Path("xml/{id}")
+    @Path("/{id}")
     @Produces(APPLICATION_XML)
-    public String getByIdXml(@PathParam("id") Long id) {
+    public Carrinho getById(@PathParam("id") Long id) {
         Carrinho carrinho = new CarrinhoDAO().busca(id);
-        return carrinho.toXML();
+        return carrinho;
     }
 
     @GET()
@@ -40,54 +42,25 @@ public class CarrinhoResource {
     }
 
     @POST
-    @Path("xml")
     @Consumes(APPLICATION_XML)
-    public Response postXml(String conteudo) {
-        Carrinho carrinho = (Carrinho) new XStream().fromXML(conteudo);
+    public Response post(Carrinho carrinho) {
         new CarrinhoDAO().adiciona(carrinho);
-        return Response.created(getUri(XML, carrinho.getId())).build();
-    }
-
-    @POST
-    @Path("json")
-    @Consumes(APPLICATION_JSON)
-    public Response postJson(String conteudo) {
-        Carrinho carrinho = new Gson().fromJson(conteudo, Carrinho.class);
-        new CarrinhoDAO().adiciona(carrinho);
-        return Response.created(getUri(JSON, carrinho.getId())).build();
+        return Response.created(getUri(carrinho.getId())).build();
     }
 
     @DELETE
-    @Path("xml/{carrinhoId}/produtos/{id}")
-    public Response deleteXml(@PathParam("carrinhoId") Long carrinhoId, @PathParam("id") Long id) {
-        Carrinho carrinho = new CarrinhoDAO().busca(carrinhoId);
-        carrinho.remove(id);
-        return Response.ok().build();
-    }
-
-    @DELETE
-    @Path("json/{carrinhoId}/produtos/{id}")
-    public Response deleteJson(@PathParam("carrinhoId") Long carrinhoId, @PathParam("id") Long id) {
+    @Path("{carrinhoId}/produtos/{id}")
+    public Response delete(@PathParam("carrinhoId") Long carrinhoId, @PathParam("id") Long id) {
         Carrinho carrinho = new CarrinhoDAO().busca(carrinhoId);
         carrinho.remove(id);
         return Response.ok().build();
     }
 
     @PUT
-    @Path("xml/{carrinhoId}/produtos/{id}/quantidade")
-    public Response putXml(String conteudo, @PathParam("carrinhoId") Long carrinhoId, @PathParam("id") Long id) {
+    @Path("{carrinhoId}/produtos/{id}/quantidade")
+    public Response put(Produto produto, @PathParam("carrinhoId") Long carrinhoId, @PathParam("id") Long id) {
         Carrinho carrinho = new CarrinhoDAO().busca(carrinhoId);
-        Produto produto = (Produto) new XStream().fromXML(conteudo);
         carrinho.troca(produto);
-        return Response.ok().build();
-    }
-
-    @PUT
-    @Path("json/{carrinhoId}/produtos/{id}/quantidade")
-    public Response putJson(String conteudo, @PathParam("carrinhoId") Long carrinhoId, @PathParam("id") Long id) {
-        Carrinho carrinho = new CarrinhoDAO().busca(carrinhoId);
-        Produto produto = new Gson().fromJson(conteudo, Produto.class);
-        carrinho.trocaQuantidade(produto);
         return Response.ok().build();
     }
 
